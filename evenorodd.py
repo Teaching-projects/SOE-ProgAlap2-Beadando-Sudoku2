@@ -1,6 +1,6 @@
 class Evenorodd(Game): 
     def __init__(self):
-        pass
+        super().__init__(self)
 
     def check(self):
         if(super().check()):
