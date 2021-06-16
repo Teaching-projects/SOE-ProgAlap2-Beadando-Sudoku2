@@ -3,19 +3,19 @@ import random
 class Field:
 
     num = None
-    starter = True
+    starter = False
     shaded = False
+    
 
     def __init__(self, num, starter = False, shaded = False):
         self.num = num
         self.starter = starter
-        self.shaded = shaded
 
 class Game:
     megoldottTabla = [[0 for i in range(9)] for j in range(9)]
     feladatTabla = [[Field(0) for i in range(9)] for j in range(9)]
-    lives = 3
-    help = 5
+    misstake = 3
+    helpCount = 5
     def __init__(self, mode):
         
         """
@@ -127,32 +127,6 @@ class Game:
             return False
         return True    
 
-    # def check(self):
-    #     for i in range(len(self.megoldottTabla)):
-    #         sor=set()
-    #         for j in range(len(self.megoldottTabla[i])):
-    #             sor.add(self.megoldottTabla[i][j])
-    #         if len(sor)!=9:
-    #              return False    
-
-
-    #     for i in range(len(self.megoldottTabla)):
-    #         oszlop=set()
-    #         for j in range(len(self.megoldottTabla[i])):
-    #             oszlop.add(self.megoldottTabla[j][i])
-    #         if len(oszlop)!=9:
-    #             return False 
-
-    #     for i in range(0,3):
-    #         for j in range(0,3):
-    #             negyzet=set()
-    #             for k in range(0,3):
-    #                 for l in range(0,3):
-    #                     negyzet.add(self.megoldottTabla[i*3+k][j*3+l])
-    #             if len(negyzet)!=9:
-    #                 return False
-    #     return True
-
     def kezdotablaKeszites(self, szint):
         """
         A megadott szint alapján hozza létre a megadott tábla alap tábláját. Szintenként eltér, hogy hány számot rakunk bele a kezdő táblánkba.
@@ -208,15 +182,19 @@ class Game:
             num (int): a szám amit az adott mezőbe írni szeretnénk
 
         Returns:
-            int: a számok döntik el, hogy helyes-e a szám és bekerülhet-e a mezőbe, helytelen-e a szám és hibázhatunk-e még vagy helytelen-e a szám és már nem hibázhatunk.
+            int: a számok döntik el, hogy helyes-e a szám és bekerülhet-e a mezőbe, annak hatására vége lett-e a játéknak, helytelen-e a szám és hibázhatunk-e még vagy helytelen-e a szám és már nem hibázhatunk.
                  Az utolsó eshetőségben a játék véget ér. A függvény ezt jelzi a 2-es visszatérési értékkel, amelyet a program a későbbiekben lekezel.
         """
         if self.megoldottTabla[x][y] == num:
             self.feladatTabla[x][y].num = num
-            return 0 # helyes szám kerül a mezőbe
+            for i in self.feladatTabla:
+                for j in i:
+                    if j.num == 0:
+                        return 0 # helyes szám kerül a mezőbe, és még nincs vége a játéknak
+            return 3 # helyes szám kerül a mezőbe, és vége a játéknak
         else:
-            self.lives -=1
-            if self.lives == 0:
+            self.misstake -=1
+            if self.misstake == 0:
                 return 2 # helytelen szám és elfogyott az életünk
             return 1 # helytelen szám, de még van életünk
     
@@ -228,4 +206,9 @@ class Game:
             x (int): annak a mezőnek az x koordinátája amelybe az adott számot írni szeretnénk segítségképp
             y (int): annak a mezőnek az y koordinátája amelybe az adott számot írni szeretnénk segítségképp
         """
-        self.feladatTabla[x][y].num = self.megoldottTabla[x][y]
+        if(self.helpCount != 0):
+            self.feladatTabla[x][y].num = self.megoldottTabla[x][y]
+            self.helpCount -= 1
+            return self.megoldottTabla[x][y]
+        else:
+            return -1
